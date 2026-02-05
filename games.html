@@ -3,140 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Matisov X | Cyber Samurai</title>
+    <title>Matisov X | Official TWA</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-        body { background: #050505; color: white; font-family: 'Inter', sans-serif; overflow: hidden; user-select: none; }
-        .cyber-font { font-family: 'Orbitron', sans-serif; }
-        .samurai-aura { position: relative; transition: all 0.5s ease; border-radius: 50%; }
-        .stage-1 { box-shadow: 0 0 20px rgba(0, 210, 255, 0.2); border: 2px solid #00d2ff; }
-        .stage-2 { box-shadow: 0 0 40px rgba(0, 210, 255, 0.6); border: 3px solid #00d2ff; filter: saturate(1.5); }
-        .stage-3 { box-shadow: 0 0 60px rgba(255, 0, 234, 0.7); border: 4px solid #ff00ea; filter: hue-rotate(280deg); }
-        .energy-bar { height: 8px; background: #111; border-radius: 4px; overflow: hidden; border: 1px solid #222; }
-        .energy-fill { height: 100%; background: linear-gradient(90deg, #00d2ff, #0055ff); transition: width 0.2s; }
-        .tap-text { position: absolute; color: #00d2ff; font-weight: bold; pointer-events: none; animation: floatUp 0.8s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
-        .spark { position: absolute; width: 4px; height: 4px; background: #00d2ff; pointer-events: none; animation: spark-anim 0.4s linear forwards; }
-        @keyframes spark-anim { to { transform: translate(var(--tw-x), var(--tw-y)); opacity: 0; } }
-        .screen { display: none; height: calc(100vh - 80px); overflow-y: auto; }
-        .screen.active { display: block; }
-        .nav-btn.active { color: #00d2ff; border-top: 2px solid #00d2ff; background: rgba(0, 210, 255, 0.05); }
+        body { background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        .cyber-aura { border: 2px solid #00d2ff; border-radius: 50%; box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); }
+        .energy-bar { background: #1a1a1e; height: 8px; border-radius: 4px; border: 1px solid #333; }
+        .energy-fill { background: #00d2ff; height: 100%; transition: width 0.2s; box-shadow: 0 0 10px #00d2ff; }
+        .tap-anim { position: absolute; color: #00d2ff; font-weight: 900; pointer-events: none; animation: floatUp 0.8s forwards; z-index: 50; }
+        @keyframes floatUp { to { transform: translateY(-100px); opacity: 0; } }
+        .screen { display: none; height: calc(100vh - 120px); overflow-y: auto; }
+        .active { display: block; }
+        .nav-btn { color: #555; transition: 0.3s; }
+        .nav-active { color: #00d2ff; }
+        /* Ефект іскри при тапі */
+        .spark { position: absolute; background: #00d2ff; width: 3px; height: 3px; border-radius: 50%; pointer-events: none; animation: spark 0.4s linear forwards; }
+        @keyframes spark { to { transform: translate(var(--x), var(--y)); opacity: 0; } }
     </style>
 </head>
 <body class="flex flex-col h-screen">
 
-    <div class="p-4 flex justify-between items-center border-b border-gray-900 bg-[#0a0a0c]">
+    <header class="p-5 flex justify-between items-start">
         <div>
-            <p class="text-[10px] text-gray-500 uppercase tracking-widest cyber-font">Total Balance</p>
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest">Total Balance</p>
             <div class="flex items-center gap-1">
-                <span id="main-balance" class="text-3xl font-bold cyber-font text-white">0</span>
-                <span class="text-blue-500 text-xs font-bold">MX</span>
+                <span id="balance" class="text-4xl font-bold">0</span>
+                <span class="text-blue-500 font-bold">MX</span>
             </div>
         </div>
         <div class="text-right">
-            <p id="rank-name" class="text-[10px] text-blue-400 font-bold uppercase">Ronin (Stage 1)</p>
-            <p class="text-[9px] text-gray-600">1,000,000 MX = 1 Coin</p>
+            <p id="rank" class="text-[10px] text-blue-400 font-bold uppercase">Ronin (Stage 1)</p>
+            <p class="text-[9px] text-gray-600 italic">1,000,000 MX = 1 Coin</p>
         </div>
-    </div>
+    </header>
 
-    <main class="flex-1">
-        <section id="screen-home" class="screen active p-6 flex flex-col items-center justify-center">
-            <div id="tap-area" class="samurai-aura stage-1 mb-8">
-                <img src="https://raw.githubusercontent.com/CUBERIONAI/Matisov-X-/ec2f8b52d25750ccb90f4afb2c2666c455b98407/IMG_20260205_104400_997_105248.jpg" 
-                     alt="Cyber Samurai" class="w-64 h-64 rounded-full object-cover">
+    <main class="flex-1 relative">
+        
+        <section id="game" class="screen active flex flex-col items-center justify-center p-6">
+            <div id="tap-target" class="relative">
+                <img id="samurai" src="https://raw.githubusercontent.com/CUBERIONAI/Matisov-X-/ec2f8b52d25750ccb90f4afb2c2666c455b98407/IMG_20260205_104400_997_105248.jpg" 
+                     class="w-72 h-72 object-cover cyber-aura active:scale-95 transition-transform duration-75">
             </div>
-            
-            <div class="w-full max-w-xs space-y-2">
-                <div class="flex justify-between text-[10px] font-bold text-gray-400 uppercase">
-                    <span>⚡ Energy</span>
-                    <span id="energy-stat">1000 / 1000</span>
+
+            <div class="w-full max-w-xs mt-12">
+                <div class="flex justify-between text-[10px] mb-2 font-bold tracking-widest">
+                    <span>⚡ ENERGY</span>
+                    <span id="energy-text">1000 / 1000</span>
                 </div>
                 <div class="energy-bar">
-                    <div id="energy-fill" class="energy-fill" style="width: 100%"></div>
+                    <div id="energy-fill" class="energy-fill w-full"></div>
                 </div>
             </div>
         </section>
 
-        <section id="screen-boost" class="screen p-6">
-            <h2 class="text-xl font-bold mb-6 cyber-font text-blue-400">Upgrades</h2>
-            <div class="space-y-4">
-                <div onclick="buyUpgrade('tap')" class="bg-[#111] p-4 rounded-xl border border-gray-800 flex justify-between items-center active:scale-95 transition">
-                    <div><p class="font-bold">⚔️ Tap Power</p><p class="text-xs text-gray-500">Lvl <span id="lvl-tap">1</span></p></div>
-                    <p class="text-sm text-yellow-500">5,000 MX</p>
+        <section id="tasks" class="screen p-6">
+            <h2 class="text-xl font-bold mb-6 text-blue-400">Bonus Center</h2>
+            <div class="space-y-3" id="tasks-list">
                 </div>
-                <div onclick="buyUpgrade('energy')" class="bg-[#111] p-4 rounded-xl border border-gray-800 flex justify-between items-center active:scale-95 transition">
-                    <div><p class="font-bold">🔋 Energy Cap</p><p class="text-xs text-gray-500">Lvl <span id="lvl-energy">1</span></p></div>
-                    <p class="text-sm text-yellow-500">10,000 MX</p>
-                </div>
-                <div onclick="buyUpgrade('bot')" class="bg-[#111] p-4 rounded-xl border border-gray-800 flex justify-between items-center active:scale-95 transition">
-                    <div><p class="font-bold">🤖 AI Bot (Offline)</p><p class="text-xs text-gray-500">Lvl <span id="lvl-bot">1</span></p></div>
-                    <p class="text-sm text-yellow-500">25,000 MX</p>
-                </div>
-            </div>
         </section>
 
-        <section id="screen-tasks" class="screen p-6">
-            <h2 class="text-xl font-bold mb-6 cyber-font text-blue-400">Bonus Center</h2>
-            <div id="tasks-container" class="space-y-3">
-                <script>
-                    const tasks = [
-                        { id: 'tg_c', name: "Join TG Channel", link: "https://t.me/Matisov_X", reward: 1000000 },
-                        { id: 'tg_h', name: "Join TG Chat", link: "https://t.me/MatisovX", reward: 1000000 },
-                        { id: 'yt', name: "Subscribe YouTube", link: "https://www.youtube.com/@MatisovX", reward: 1000000 },
-                        { id: 'ig', name: "Follow Instagram", link: "https://www.instagram.com/matisov.x", reward: 1000000 },
-                        { id: 'tw', name: "Follow X (Twitter)", link: "https://x.com/matisovx", reward: 1000000 },
-                        { id: 'repost', name: "Repost Video", link: "#", reward: 1000000 }
-                    ];
-                </script>
-            </div>
-        </section>
-
-        <section id="screen-frens" class="screen p-6">
-            <h2 class="text-xl font-bold mb-2 cyber-font text-blue-400">Friends</h2>
-            <p class="text-xs text-gray-500 mb-6 italic">Earn 20% from all friend's activity!</p>
+        <section id="frens" class="screen p-6">
+            <h2 class="text-xl font-bold mb-2">Invite Friends</h2>
+            <p class="text-xs text-gray-400 mb-6 italic">Earn 20% from friend's activity!</p>
             <div class="bg-[#111] p-6 rounded-2xl border border-gray-800 text-center mb-6">
-                <p class="text-[10px] text-gray-500 uppercase mb-2">Your Invite Link</p>
-                <p class="text-sm text-blue-400 font-mono mb-4 truncate">t.me/MatisovX_bot?start=user123</p>
-                <button onclick="copyRef()" class="w-full py-3 bg-blue-600 rounded-xl font-bold text-sm uppercase">Copy & Invite</button>
+                <p class="text-xs text-blue-400 mb-4 font-mono truncate">t.me/MatisovX_bot?start=user123</p>
+                <button onclick="tg.showAlert('Link Copied!')" class="w-full py-3 bg-blue-600 rounded-xl font-bold text-sm">Copy Invite Link</button>
             </div>
             <div class="grid grid-cols-2 gap-4">
-                <div class="bg-[#0a0a0a] p-4 rounded-xl border border-gray-900">
+                <div class="bg-black border border-gray-800 p-4 rounded-xl text-center">
                     <p id="fren-count" class="text-2xl font-bold">0</p>
-                    <p class="text-[10px] text-gray-500">Total Frens</p>
+                    <p class="text-[10px] text-gray-500 uppercase">Friends</p>
                 </div>
-                <div class="bg-[#0a0a0a] p-4 rounded-xl border border-gray-900">
-                    <p id="fren-bonus" class="text-2xl font-bold text-green-500">0</p>
-                    <p class="text-[10px] text-gray-500">Passive (20%)</p>
+                <div class="bg-black border border-gray-800 p-4 rounded-xl text-center">
+                    <p class="text-2xl font-bold text-green-500">20%</p>
+                    <p class="text-[10px] text-gray-500 uppercase">Commision</p>
                 </div>
-            </div>
-        </section>
-
-        <section id="screen-wallet" class="screen p-6 flex flex-col items-center justify-center">
-            <div class="bg-gradient-to-br from-blue-900/40 to-black p-8 rounded-3xl border border-blue-500/50 w-full mb-8 text-center">
-                <p class="text-xs text-blue-300 uppercase tracking-widest mb-4">Minting Progress</p>
-                <div class="flex items-center justify-center gap-2 mb-2">
-                    <span id="coin-val" class="text-4xl font-bold cyber-font">0.00</span>
-                    <span class="text-sm text-blue-400">MX Coin</span>
-                </div>
-            </div>
-            <div class="w-full space-y-3">
-                <div class="h-2 bg-gray-900 rounded-full border border-gray-800 overflow-hidden">
-                    <div id="mint-bar" class="h-full bg-blue-500 w-0 transition-all"></div>
-                </div>
-                <p class="text-center text-[10px] text-gray-500 uppercase">Need 1,000,000 MX for 1 Coin</p>
-                <button class="w-full py-4 mt-4 bg-gray-800 text-gray-500 rounded-2xl font-bold text-xs uppercase cursor-not-allowed">Connect TON Wallet</button>
             </div>
         </section>
     </main>
 
-    <footer class="h-20 bg-[#0a0a0c] border-t border-gray-900 flex justify-around items-center">
-        <button onclick="nav('home')" class="nav-btn active flex-1 h-full flex flex-col items-center justify-center"><span>⚔️</span><span class="text-[10px] uppercase">Home</span></button>
-        <button onclick="nav('boost')" class="nav-btn flex-1 h-full flex flex-col items-center justify-center"><span>🚀</span><span class="text-[10px] uppercase">Boost</span></button>
-        <button onclick="nav('tasks')" class="nav-btn flex-1 h-full flex flex-col items-center justify-center"><span>🎁</span><span class="text-[10px] uppercase">Bonus</span></button>
-        <button onclick="nav('frens')" class="nav-btn flex-1 h-full flex flex-col items-center justify-center"><span>👥</span><span class="text-[10px] uppercase">Frens</span></button>
-        <button onclick="nav('wallet')" class="nav-btn flex-1 h-full flex flex-col items-center justify-center"><span>💎</span><span class="text-[10px] uppercase">Wallet</span></button>
+    <footer class="h-24 bg-[#0a0a0c] border-t border-gray-900 flex justify-around items-center px-4">
+        <button onclick="nav('game')" class="nav-btn nav-active flex flex-col items-center">
+            <span class="text-2xl">⚔️</span><span class="text-[10px] font-bold mt-1">GAME</span>
+        </button>
+        <button onclick="nav('tasks')" class="nav-btn flex flex-col items-center">
+            <span class="text-2xl">🎁</span><span class="text-[10px] font-bold mt-1">BONUS</span>
+        </button>
+        <button onclick="nav('frens')" class="nav-btn flex flex-col items-center">
+            <span class="text-2xl">👥</span><span class="text-[10px] font-bold mt-1">FRIENDS</span>
+        </button>
     </footer>
 
     <script>
@@ -144,156 +100,112 @@
         tg.expand();
 
         // --- GAME STATE ---
-        let state = {
-            balance: 0,
-            totalLifetime: 0,
-            energy: 1000,
-            maxEnergy: 1000,
-            tapPower: 1,
-            botLvl: 0,
-            frens: 0,
-            lastClaim: Date.now()
-        };
+        let balance = 0;
+        let energy = 1000;
+        let tapPower = 1;
 
-        // --- INITIALIZATION ---
-        function initTasks() {
-            const container = document.getElementById('tasks-container');
-            tasks.forEach(t => {
-                container.innerHTML += `
-                    <div class="bg-[#111] p-4 rounded-xl flex justify-between items-center border border-gray-900">
-                        <div><p class="text-sm font-bold">${t.name}</p><p class="text-xs text-blue-400">+1,000,000 MX</p></div>
-                        <button onclick="doTask('${t.link}', ${t.reward})" class="bg-white text-black px-4 py-1 rounded-lg text-[10px] font-black uppercase">Go</button>
-                    </div>`;
-            });
-        }
+        const tasksData = [
+            { id: 1, name: "Matisov X Channel", reward: 1000000, link: "https://t.me/Matisov_X" },
+            { id: 2, name: "Matisov X Chat", reward: 1000000, link: "https://t.me/MatisovX" },
+            { id: 3, name: "YouTube Subscribe", reward: 1000000, link: "https://www.youtube.com/@MatisovX" },
+            { id: 4, name: "Instagram Follow", reward: 1000000, link: "https://www.instagram.com/matisov.x" },
+            { id: 5, name: "X (Twitter) Follow", reward: 1000000, link: "https://x.com/matisovx" }
+        ];
 
-        // --- CORE LOGIC ---
-        const tapArea = document.getElementById('tap-area');
-        
-        tapArea.addEventListener('touchstart', (e) => {
+        // --- TAP LOGIC ---
+        const target = document.getElementById('tap-target');
+        target.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (state.energy >= state.tapPower) {
+            if (energy >= tapPower) {
                 const touch = e.touches[0];
-                state.balance += state.tapPower;
-                state.totalLifetime += state.tapPower;
-                state.energy -= state.tapPower;
-                
-                spawnText(touch.clientX, touch.clientY, `+${state.tapPower}`);
-                createSparks(touch.clientX, touch.clientY);
-                updateUI();
-                
-                if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+                processTap(touch.clientX, touch.clientY);
             }
         });
 
-        function spawnText(x, y, txt) {
-            const el = document.createElement('div');
-            el.className = 'tap-text cyber-font';
-            el.style.left = x + 'px'; el.style.top = y + 'px';
-            el.innerText = txt;
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 800);
+        function processTap(x, y) {
+            balance += tapPower;
+            energy -= tapPower;
+            
+            updateUI();
+            createFloatText(x, y);
+            createSparks(x, y);
+            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            checkEvolution();
+        }
+
+        function updateUI() {
+            document.getElementById('balance').innerText = balance.toLocaleString();
+            document.getElementById('energy-text').innerText = `${energy} / 1000`;
+            document.getElementById('energy-fill').style.width = (energy / 1000 * 100) + '%';
+        }
+
+        function createFloatText(x, y) {
+            const t = document.createElement('div');
+            t.className = 'tap-anim';
+            t.style.left = x + 'px'; t.style.top = y + 'px';
+            t.innerText = `+${tapPower}`;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 800);
         }
 
         function createSparks(x, y) {
-            for(let i=0; i<5; i++) {
+            for(let i=0; i<6; i++) {
                 const s = document.createElement('div');
                 s.className = 'spark';
                 s.style.left = x + 'px'; s.style.top = y + 'px';
-                s.style.setProperty('--tw-x', (Math.random()*100 - 50)+'px');
-                s.style.setProperty('--tw-y', (Math.random()*100 - 50)+'px');
+                s.style.setProperty('--x', (Math.random()*80 - 40)+'px');
+                s.style.setProperty('--y', (Math.random()*80 - 40)+'px');
                 document.body.appendChild(s);
                 setTimeout(() => s.remove(), 400);
             }
         }
 
-        function updateUI() {
-            document.getElementById('main-balance').innerText = Math.floor(state.balance).toLocaleString();
-            document.getElementById('energy-stat').innerText = `${state.energy} / ${state.maxEnergy}`;
-            document.getElementById('energy-fill').style.width = (state.energy / state.maxEnergy * 100) + '%';
-            
-            // Stages Evolution (Section 4)
-            const samurai = document.getElementById('tap-area');
-            const rank = document.getElementById('rank-name');
-            if (state.totalLifetime >= 10000000) {
-                samurai.className = "samurai-aura stage-3 mb-8";
+        // --- NAVIGATION & TASKS ---
+        function nav(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
+            event.currentTarget.classList.add('nav-active');
+        }
+
+        function initTasks() {
+            const list = document.getElementById('tasks-list');
+            tasksData.forEach(t => {
+                list.innerHTML += `
+                    <div class="bg-[#111] p-4 rounded-xl border border-gray-800 flex justify-between items-center">
+                        <div><p class="font-bold text-sm">${t.name}</p><p class="text-xs text-blue-400">+1,000,000 MX</p></div>
+                        <button onclick="claimTask('${t.link}', ${t.reward})" class="bg-blue-600 px-4 py-1 rounded-lg text-xs font-bold uppercase">Go</button>
+                    </div>`;
+            });
+        }
+
+        function claimTask(url, reward) {
+            window.open(url, '_blank');
+            setTimeout(() => {
+                balance += reward;
+                updateUI();
+                tg.showAlert(`Successfully earned ${reward.toLocaleString()} MX!`);
+            }, 3000);
+        }
+
+        function checkEvolution() {
+            const sam = document.getElementById('samurai');
+            const rank = document.getElementById('rank');
+            if(balance >= 10000000) {
+                sam.style.boxShadow = "0 0 50px #ff00ea"; sam.style.borderColor = "#ff00ea";
                 rank.innerText = "Shogun (Stage 3)";
-            } else if (state.totalLifetime >= 1000000) {
-                samurai.className = "samurai-aura stage-2 mb-8";
+            } else if(balance >= 1000000) {
+                sam.style.boxShadow = "0 0 30px #00d2ff";
                 rank.innerText = "Cyber Samurai (Stage 2)";
             }
-
-            // Wallet Progress
-            const coinVal = (state.balance / 1000000).toFixed(2);
-            document.getElementById('coin-val').innerText = coinVal;
-            document.getElementById('mint-bar').style.width = Math.min(100, (state.balance / 1000000 * 100)) + '%';
         }
 
-        // --- OFFLINE FARMING (Section 2) ---
-        function checkOffline() {
-            const now = Date.now();
-            const hours = Math.min(8, (now - state.lastClaim) / 3600000);
-            if (hours > 0.05 && state.botLvl > 0) {
-                const income = Math.floor(hours * (state.botLvl * 5000));
-                state.balance += income;
-                tg.showConfirm(`AI Bot collected ${income.toLocaleString()} MX while you were away!`);
-            }
-            state.lastClaim = now;
-        }
-
-        // --- UPGRADES (Section 2) ---
-        function buyUpgrade(type) {
-            if (type === 'tap' && state.balance >= 5000) {
-                state.balance -= 5000; state.tapPower++;
-                document.getElementById('lvl-tap').innerText = state.tapPower;
-            } else if (type === 'energy' && state.balance >= 10000) {
-                state.balance -= 10000; state.maxEnergy += 500; state.energy = state.maxEnergy;
-                document.getElementById('lvl-energy').innerText = (state.maxEnergy/1000).toFixed(1);
-            } else if (type === 'bot' && state.balance >= 25000) {
-                state.balance -= 25000; state.botLvl++;
-                document.getElementById('lvl-bot').innerText = state.botLvl;
-            } else {
-                tg.showAlert("Not enough MX!");
-            }
-            updateUI();
-        }
-
-        // --- UTILS ---
-        function nav(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-' + id).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
-        }
-
-        function doTask(url, reward) {
-            if(url !== "#") window.open(url, '_blank');
-            setTimeout(() => {
-                state.balance += reward;
-                state.totalLifetime += reward;
-                updateUI();
-                tg.showAlert("Task Verified! +1,000,000 MX");
-            }, 2000);
-        }
-
-        function copyRef() {
-            navigator.clipboard.writeText("t.me/MatisovX_bot?start=user123");
-            tg.showAlert("Invite link copied!");
-        }
-
-        // --- REGEN ---
+        // Energy Regeneration
         setInterval(() => {
-            if (state.energy < state.maxEnergy) {
-                state.energy = Math.min(state.maxEnergy, state.energy + 3);
-                updateUI();
-            }
+            if(energy < 1000) { energy = Math.min(1000, energy + 2); updateUI(); }
         }, 1000);
 
-        // --- START ---
         initTasks();
-        checkOffline();
-        updateUI();
     </script>
 </body>
 </html>
