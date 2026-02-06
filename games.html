@@ -1,217 +1,262 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Matisov X – Base Game</title>
-
+<title>Matisov X | Cyber Samurai</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-/* ===== RESET ===== */
-* {
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+body { 
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* ===== BACKGROUND (NO IMAGES) ===== */
-body {
-    height: 100vh;
-    background:
-        radial-gradient(circle at 50% 30%, rgba(0,210,255,0.12), transparent 60%),
-        radial-gradient(circle at 80% 80%, rgba(0,80,255,0.08), transparent 50%),
-        linear-gradient(180deg, #050608 0%, #070b14 50%, #020205 100%);
-    font-family: Arial, sans-serif;
+    font-family: 'Orbitron', sans-serif; 
+    overflow: hidden; 
+    user-select: none; 
+    background: #050505 url('https://raw.githubusercontent.com/CUBERIONAI/Matisov-X/main/game-background.png') no-repeat center center; 
+    background-size: cover;
     color: white;
-    overflow: hidden;
-    user-select: none;
 }
 
-/* ===== LAYOUT ===== */
-.game {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-}
-
-/* ===== HEADER ===== */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.balance {
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.stage {
-    font-size: 12px;
-    opacity: 0.7;
-}
-
-/* ===== HERO AREA ===== */
-.hero-area {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.hero-box {
+/* Ефект аури навколо самурая як на скріншоті */
+.samurai-container {
     position: relative;
-    width: 240px;
-    height: 240px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 320px;
+    height: 320px;
+    margin: 0 auto;
 }
 
-/* GLOW UNDER HERO */
-.hero-glow {
+.aura {
     position: absolute;
-    bottom: 20px;
-    width: 200px;
-    height: 40px;
-    background: radial-gradient(ellipse, rgba(0,210,255,0.35), transparent 70%);
-    filter: blur(12px);
-    z-index: 1;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 210, 255, 0.4);
+    box-shadow: 0 0 40px rgba(0, 210, 255, 0.6), inset 0 0 20px rgba(0, 210, 255, 0.3);
+    animation: pulse 3s infinite ease-in-out;
 }
 
-/* HERO IMAGE */
-#hero {
-    width: 100%;
-    height: auto;
-    z-index: 2;
-    transition: transform 0.08s ease;
+@keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+    50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.9; }
 }
 
-/* TAP EFFECT */
-.hit {
-    transform: scale(1.12);
+#samurai {
+    position: relative;
+    z-index: 5;
+    max-height: 100%;
+    filter: drop-shadow(0 0 20px rgba(0, 210, 255, 0.4));
+    transition: transform 0.05s;
 }
 
-/* ===== ENERGY ===== */
-.energy {
-    margin-top: 10px;
+/* Футуристичний дизайн балансу */
+.balance-glow {
+    color: #00d2ff;
+    text-shadow: 0 0 20px rgba(0, 210, 255, 0.8), 0 0 5px white;
+    font-style: italic;
 }
 
-.energy-bar {
-    width: 100%;
-    height: 10px;
-    background: #111;
-    border-radius: 6px;
-    overflow: hidden;
+/* Новий дизайн панелі енергії (Cyber Frame) */
+.cyber-energy-frame {
+    position: relative;
+    background: rgba(20, 20, 25, 0.8);
+    border: 2px solid #1a1a1e;
+    padding: 4px;
+    border-radius: 4px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.cyber-energy-frame::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: 10%; width: 80%; height: 2px;
+    background: #00d2ff; box-shadow: 0 0 10px #00d2ff;
 }
 
 .energy-fill {
-    height: 100%;
+    height: 10px;
     background: linear-gradient(90deg, #00d2ff, #0055ff);
-    width: 100%;
-    transition: width 0.2s;
+    box-shadow: 0 0 15px #00d2ff;
+    transition: width 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
 }
 
-/* ===== FOOTER ===== */
-.footer {
-    height: 60px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    opacity: 0.8;
-    font-size: 12px;
+.mx-popup {
+    position: absolute; color: #00d2ff; font-weight: 900; font-size: 38px;
+    pointer-events: none; animation: floatUp 0.6s ease-out forwards;
+    text-shadow: 0 0 15px #00d2ff; z-index: 100;
 }
+
+@keyframes floatUp { 0% { transform: translateY(0) scale(0.8); opacity: 1; } 100% { transform: translateY(-130px) scale(1.3); opacity: 0; } }
+
+.nav-btn.active { color: #00d2ff; filter: drop-shadow(0 0 8px #00d2ff); }
+.screen { display: none; height: calc(100vh - 180px); overflow-y: auto; }
+.active-screen { display: block; }
 </style>
 </head>
+<body class="flex flex-col h-screen p-6">
 
-<body>
+<audio id="sfx-hit" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
 
-<div class="game">
-
-    <!-- HEADER -->
-    <div class="header">
-        <div class="balance">
-            <span id="balance">0</span> MX
-        </div>
-        <div class="stage" id="stage">Stage 1</div>
-    </div>
-
-    <!-- HERO -->
-    <div class="hero-area" id="tap-area">
-        <div class="hero-box">
-            <div class="hero-glow"></div>
-            <img
-                id="hero"
-                src="https://raw.githubusercontent.com/CUBERIONAI/Matisov-X/main/file_0000000008b471f48ebdb6f35b1b1a5a.png"
-                alt="Hero">
+<header class="flex justify-between items-start mb-6">
+    <div>
+        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">Balance</p>
+        <div class="flex items-center gap-2">
+            <span id="balance" class="text-4xl font-black balance-glow">0</span>
+            <span class="text-blue-500 font-bold text-sm">MX</span>
         </div>
     </div>
+    <div class="text-right">
+        <p id="rank" class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Stage 1</p>
+        <p class="text-[8px] text-gray-600 italic">1M MX = 1 Coin</p>
+    </div>
+</header>
 
-    <!-- ENERGY -->
-    <div class="energy">
-        <div class="energy-bar">
-            <div class="energy-fill" id="energy-fill"></div>
+<main class="flex-1 flex flex-col justify-around">
+    <section id="game-screen" class="screen active-screen">
+        <div class="samurai-container" id="tap-target">
+            <div class="aura"></div>
+            <img id="samurai" src="https://raw.githubusercontent.com/CUBERIONAI/Matisov-X/main/1770305168681.png" alt="Samurai">
         </div>
-    </div>
 
-    <!-- FOOTER -->
-    <div class="footer">
-        <div>⚔️ FIGHT</div>
-        <div>🎁 EARN</div>
-        <div>👥 FRIENDS</div>
-    </div>
+        <div class="mt-12">
+            <div class="flex justify-between text-[9px] mb-2 font-black tracking-[0.2em] text-blue-300">
+                <span>⚡ ENERGY</span>
+                <span id="energy-text">1000/1000</span>
+            </div>
+            <div class="cyber-energy-frame">
+                <div id="energy-fill" class="energy-fill" style="width: 100%"></div>
+            </div>
+        </div>
+    </section>
 
-</div>
+    <section id="tasks-screen" class="screen p-2">
+        <h2 class="text-xl font-bold mb-4 text-blue-400 border-b border-blue-900 pb-2">MISSIONS</h2>
+        <div id="task-list" class="space-y-3"></div>
+    </section>
+</main>
+
+<footer class="h-20 bg-[#0a0a0c]/90 border-t border-gray-800 flex justify-around items-center -mx-6 px-6">
+    <button onclick="nav('game')" class="nav-btn active flex flex-col items-center">
+        <span class="text-2xl">⚔️</span><span class="text-[9px] font-bold mt-1 uppercase">Fight</span>
+    </button>
+    <button onclick="nav('tasks')" class="nav-btn flex flex-col items-center">
+        <span class="text-2xl">🎁</span><span class="text-[9px] font-bold mt-1 uppercase">Earn</span>
+    </button>
+    <button class="nav-btn flex flex-col items-center opacity-30">
+        <span class="text-2xl">👥</span><span class="text-[9px] font-bold mt-1 uppercase">Frens</span>
+    </button>
+</footer>
 
 <script>
-/* ===== GAME LOGIC ===== */
-let balance = 0;
-let energy = 100;
-const maxEnergy = 100;
-const tapPower = 1;
+const tg = window.Telegram.WebApp;
+tg.expand();
 
-const balanceEl = document.getElementById("balance");
-const stageEl = document.getElementById("stage");
-const energyFill = document.getElementById("energy-fill");
-const hero = document.getElementById("hero");
-const tapArea = document.getElementById("tap-area");
+let balance = parseInt(localStorage.getItem('mx_bal')) || 0;
+let energy = 1000;
+let tapPower = 1;
 
-/* TAP */
-tapArea.addEventListener("touchstart", tap);
-tapArea.addEventListener("mousedown", tap);
+const samuraiFrames = [
+    "https://raw.githubusercontent.com/CUBERIONAI/Matisov-X/main/1770305168681.png",
+    "https://raw.githubusercontent.com/CUBERIONAI/Matisov-X/main/1770305191748.png",
+    "https://raw.githubusercontent.com/CUBERIONAI/Matisov-X/main/1770305246186.png",
+    "https://raw.githubusercontent.com/CUBERIONAI/Matisov-X/main/1770305263574.png"
+];
+let frameIndex = 0;
+const samurai = document.getElementById('samurai');
+const tapTarget = document.getElementById('tap-target');
+const sfxHit = document.getElementById('sfx-hit');
 
-function tap(e) {
+tapTarget.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    if (energy <= 0) return;
+    if (energy >= tapPower) {
+        const touch = e.touches[0];
+        balance += tapPower;
+        energy -= tapPower;
 
-    balance += tapPower;
-    energy -= tapPower;
+        frameIndex = (frameIndex + 1) % samuraiFrames.length;
+        samurai.src = samuraiFrames[frameIndex];
+        samurai.style.transform = "scale(1.08) translateY(-5px)";
+        setTimeout(() => samurai.style.transform = "scale(1) translateY(0)", 70);
 
-    hero.classList.add("hit");
-    setTimeout(() => hero.classList.remove("hit"), 80);
+        sfxHit.currentTime = 0;
+        sfxHit.volume = 0.4;
+        sfxHit.play();
+        showPopup(touch.clientX, touch.clientY);
 
-    updateUI();
-}
-
-/* UI UPDATE */
-function updateUI() {
-    balanceEl.textContent = balance;
-    energyFill.style.width = (energy / maxEnergy * 100) + "%";
-
-    if (balance >= 1000) stageEl.textContent = "Stage 2";
-    if (balance >= 5000) stageEl.textContent = "Stage 3";
-}
-
-/* ENERGY REGEN */
-setInterval(() => {
-    if (energy < maxEnergy) {
-        energy++;
+        if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         updateUI();
+        save();
     }
+});
+
+function showPopup(x, y) {
+    const p = document.createElement('div');
+    p.className = 'mx-popup';
+    p.style.left = (x - 20) + 'px'; p.style.top = (y - 40) + 'px';
+    p.innerText = `+${tapPower}`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 600);
+}
+
+function updateUI() {
+    document.getElementById('balance').innerText = balance.toLocaleString();
+    document.getElementById('energy-text').innerText = `${energy}/1000`;
+    document.getElementById('energy-fill').style.width = (energy/10) + '%';
+    const rank = document.getElementById('rank');
+    if(balance >= 10000000) rank.innerText = "Stage 3 (Shogun)";
+    else if(balance >= 1000000) rank.innerText = "Stage 2 (Samurai)";
+}
+
+const missions = [
+    { n: "Join Community", r: 1000000, l: "https://t.me/Matisov_X" },
+    { n: "Follow Twitter", r: 500000, l: "https://x.com/matisovx" }
+];
+
+function initTasks() {
+    const list = document.getElementById('task-list');
+    list.innerHTML = "";
+    missions.forEach(m => {
+        list.innerHTML += `
+        <div class="bg-[#111]/80 p-4 rounded-xl flex justify-between items-center border-l-4 border-blue-500 shadow-lg">
+            <div><p class="text-xs font-bold uppercase">${m.n}</p><p class="text-[10px] text-blue-400">+${m.r.toLocaleString()} MX</p></div>
+            <button onclick="doTask('${m.l}', ${m.r})" class="bg-blue-600 px-4 py-2 rounded text-[10px] font-black italic">CLAIM</button>
+        </div>`;
+    });
+}
+
+function doTask(url, reward) {
+    window.open(url, '_blank');
+    setTimeout(() => {
+        balance += reward;
+        updateUI();
+        save();
+        tg.showAlert("Reward Collected!");
+    }, 2000);
+}
+
+function nav(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id + '-screen').classList.add('active-screen');
+    event.currentTarget.classList.add('active');
+}
+
+function save() { 
+    localStorage.setItem('mx_bal', balance); 
+    localStorage.setItem('mx_time', Date.now()); 
+}
+
+setInterval(() => { 
+    if(energy < 1000) { 
+        energy = Math.min(1000, energy + 3); 
+        updateUI(); 
+    } 
 }, 1000);
 
+initTasks();
 updateUI();
 </script>
-
 </body>
 </html>
